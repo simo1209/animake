@@ -8,6 +8,10 @@ canvas{
     border: 3px solid black;
 }
 
+#players{
+    flex: 0 0 10%;
+}
+
 #canvas{
     flex: 0 0 35%;
 }
