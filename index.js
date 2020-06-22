@@ -5,7 +5,57 @@ let io = require('socket.io')(http);
 
 app.use(express.static('public'))
 
-let words = ["dog", "cat", "pikachu", "stickamn"];
+let words = ["dog", "cat", "pikachu", "stickman"];
+
+class Room {
+    constructor() {
+        this.players = [];
+    }
+
+    addPlayer(playerName) {
+        this.players.push(playerName);
+    }
+
+    removePlayer(playerName) {
+        let index = -1;
+        for (let i = 0; i < this.players.length; ++i) {
+            if (this.players[i].nickname == playerName) {
+                index = i;
+            }
+        };
+        if (index !== -1) this.players.splice(index, 1);
+    }
+
+    startGame() {
+        this.generateWord();
+        this.drawer = this.players[Math.floor(Math.random() * this.players.length)];
+        console.log("Drawer: ", this.drawer);
+        this.guessers = Array.from(this.players);
+        let index = -1;
+        for (let i = 0; i < this.guessers.length; ++i) {
+            if (this.guessers[i].nickname == this.drawer) {
+                index = i
+            }
+        };
+        if (index !== -1) this.guessers.splice(index, 1);
+    }
+
+    guesserRight(nickname) {
+        let index = -1;
+        for (let i = 0; i < this.guessers.length; ++i) {
+            if (this.guessers[i].nickname == nickname) {
+                index = i
+            }
+        };
+        if (index !== -1) this.guessers.splice(index, 1);
+    }
+
+    generateWord() {
+        this.guessWord = words[Math.floor(Math.random() * words.length)];
+    }
+
+}
+
 
 let rooms = {};
 
@@ -16,12 +66,12 @@ io.on('connection', (socket) => {
 
     socket.on('nick', (n) => { // When the client emits it's nickname
         nick = n;
-        if (rooms[room]) { // If there are already players in the room
-            rooms[room].push({ nickname: n }); // add the current nickname to the room
-        } else {
-            rooms[room] = [{ nickname: n }]; // or create new room and add the current nick
+        if (!rooms[room]) {
+            rooms[room] = new Room();
         }
-        io.to(room).emit("players", rooms[room]); // emit the current room to everyone in it
+        rooms[room].addPlayer(nick);
+        io.to(room).emit('chat', { nickname: nick, message: 'has joined', type: 'system' }) // notify the players
+        io.to(room).emit('players', rooms[room].players); // emit the current room to everyone in it
     });
 
     socket.on('room', (r) => { // when someone tries to enter a room
@@ -30,30 +80,32 @@ io.on('connection', (socket) => {
     });
 
     socket.on('line', (line) => { // When player draws line
-        socket.broadcast.to(room).emit("draw", line); // Draw it on everyone else's canvas
+        if (rooms[room]) {
+            if (nick == rooms[room].drawer) {
+                socket.broadcast.to(room).emit('draw', line); // Draw it on everyone else's canvas
+            }
+        }
     });
 
     socket.on('chat', (msg) => { // When someone sends message to chat 
-        io.to(room).emit('chat', { nickname: nick, message: msg }); // Broadcast it to the room
+        if (msg == rooms[room].guessWord && nick != rooms[room].drawer) { // the player guessed the word right
+            io.to(room).emit('chat', { nickname: nick, message: "guessed the word", type: 'system' })
+            rooms[room].guesserRight(nick);
+        } else {
+            io.to(room).emit('chat', { nickname: nick, message: msg, type: 'message' }); // Broadcast it to the room
+        }
     });
 
-    socket.on('start', (msg) => {
-        console.log("room: " + room + " started a game");
+    socket.on('start', (msg) => { // When someone clicks the start button
+        rooms[room].startGame();
         io.to(room).emit('start', undefined);
     })
 
     socket.on('disconnect', () => {
         console.log('user disconnected');
         if (rooms[room]) {
-            let index;
-            for (let i = 0; i < rooms[room].length; ++i) {
-                if (rooms[room][i].nickname == nick) {
-                    index
-                }
-            };
-            if (index !== -1) rooms[room].splice(index, 1);
-            io.to(room).emit("players", rooms[room]); // emit the current room to everyone in it
-            console.log(rooms);
+            rooms[room].removePlayer(nick);
+            io.to(room).emit('players', rooms[room].players); // emit the current room to everyone in it
         }
     });
 });

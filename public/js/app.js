@@ -44,7 +44,12 @@ $(function () {
 
 
 socket.on("chat", (msg) => {
-    let node = createDiv(`<b>${msg.nickname}:</b> ${msg.message}`);
+    let node;
+    if (msg.type == "system") {
+        node = createDiv(`<b>${msg.nickname} ${msg.message}</b>`);
+    } else if (msg.type == "message") {
+        node = createDiv(`<b>${msg.nickname}:</b> ${msg.message}`);
+    }
     console.log(msg);
     select("#messages").child(node);
 })
@@ -64,7 +69,7 @@ socket.on("players", (players) => {
     console.log(players);
     select("#players").html("");
     players.forEach(player => {
-        select("#players").child(createDiv(player.nickname));
+        select("#players").child(createDiv(player));
     });
 });
 
