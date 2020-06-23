@@ -28,7 +28,6 @@ body {
 #nick-form {
     padding: 0;
     margin: 0;
-    /* width: 10%; */
 }
 
 #nick-form p {
@@ -63,7 +62,6 @@ canvas {
 }
 
 #players {
-    /* align-self: ; */
     position: relative;
     flex: 0 0 10%;
 }
@@ -71,7 +69,6 @@ canvas {
 #center {
     align-self: flex-start;
     position: relative;
-    /* margin-top: %;    */
     flex: 0 0 35%;
 }
 
@@ -80,7 +77,6 @@ canvas {
 }
 
 #start {
-    /* align-self: flex-start; */
     margin-top: 0;
     margin-left: 0.5em;
     background-color: rgb(80, 167, 211);
@@ -108,7 +104,7 @@ canvas {
     background-color: white;
     height: 70%;
     width: 100%;
-    /* max-width: 13.8em; */
+    max-width: 13.8em;
     overflow: scroll;
 }
 
