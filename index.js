@@ -24,8 +24,8 @@ class Room {
 
     addPlayer(player) {
         this.players.push(player);
-        io.to(room).emit('chat', { nickname: player.nickname, message: 'has joined', type: 'system' }) // notify the players
-        io.to(room).emit('players', this.players.players.map((player) => {
+        io.to(this.roomId).emit('chat', { nickname: player.nickname, message: 'has joined', type: 'system' }) // notify the players
+        io.to(this.roomId).emit('players', this.players.map((player) => {
             return { nickname: player.nickname, points: player.points }
         })); // emit the current room to everyone in it
     }
@@ -38,6 +38,10 @@ class Room {
             }
         };
         if (index !== -1) this.players.splice(index, 1);
+
+        io.to(this.roomId).emit('players', this.players.map((player) => {
+            return { nickname: player.nickname, points: player.points }
+        })); // emit the current room to everyone in it
     }
 
     startGame() {
@@ -54,17 +58,25 @@ class Room {
 
     guesserRight(nickname) {
         let index = -1;
-        for (let i = 0; i < this.players.lengt; ++i) {
-            if (this.players[i].nickname == nickname) {
-                this.players[i].points += 1;
-            }
-        }
         for (let i = 0; i < this.guessers.length; ++i) {
             if (this.guessers[i].nickname == nickname) {
                 index = i
             }
         };
-        if (index !== -1) this.guessers.splice(index, 1);
+        if (index !== -1) {
+            this.guessers.splice(index, 1);
+            for (let i = 0; i < this.players.length; ++i) {
+                if (this.players[i].nickname == nickname) {
+                    console.log(this.players[i].nickname);
+                    this.players[i].points += 1;
+                    io.to(this.roomId).emit('chat', { nickname: nickname, message: "guessed the word", type: 'system' })
+                    io.to(this.roomId).emit('players', this.players.map((player) => {
+                        return { nickname: player.nickname, points: player.points }
+                    }));
+                    break;
+                }
+            }
+        }
         if (this.guessers.length == 0) {
             this.startGame();
         }
@@ -110,7 +122,6 @@ io.on('connection', (socket) => {
 
     socket.on('chat', (msg) => { // When someone sends message to chat 
         if (msg == rooms[room].guessWord && socket != rooms[room].drawer.socket) { // a player(who is not the drawer) guessed the word right
-            io.to(room).emit('chat', { nickname: nick, message: "guessed the word", type: 'system' })
             rooms[room].guesserRight(nick);
         } else {
             io.to(room).emit('chat', { nickname: nick, message: msg, type: 'message' }); // Broadcast it to the room
@@ -126,9 +137,6 @@ io.on('connection', (socket) => {
         console.log('user disconnected');
         if (rooms[room]) {
             rooms[room].removePlayer(nick);
-            io.to(room).emit('players', rooms[room].players.map((player) => {
-                return { nickname: player.nickname, points: player.points }
-            })); // emit the current room to everyone in it
         }
     });
 });
