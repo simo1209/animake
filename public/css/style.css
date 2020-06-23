@@ -36,6 +36,33 @@ body {
     font-size: larger;
 }
 
+#drawing-tools {
+    display: flex;
+    align-items: stretch;
+    justify-content: space-between;
+}
+
+.ColorButton {
+    border: none;
+    padding: 0;
+    display: inline-block;
+    height: 2em;
+    width: 2em;
+}
+
+.ThicknessButton {
+    border: 1px solid black;
+    color: black;
+    background-color: white;
+    padding: 0;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 1em;
+    height: 1.8em;
+    width: 1.8em;
+}
+
 #nick-form button {
     background-color: rgb(80, 167, 211);
     border: none;
@@ -59,11 +86,20 @@ canvas {
     margin: 0;
     padding: 0;
     background-color: white;
+    border: 1px solid black;
 }
 
 #players {
+    margin-right: 1em;
+    margin-bottom: 1em;
+    text-align: left;
     position: relative;
     flex: 0 0 10%;
+}
+
+#players div {
+    border: 1px solid black;
+    background-color: white;
 }
 
 #center {
@@ -95,6 +131,7 @@ canvas {
 
 #chat {
     margin-left: 0.5em;
+    border: 1px solid black;
 }
 
 #messages {

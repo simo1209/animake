@@ -1,5 +1,6 @@
 let socket = io();
 let strokeColor = "black";
+let strokeThickness = 1;
 let room;
 
 $(function() {
@@ -62,6 +63,7 @@ socket.on("start", (msg) => {
 socket.on("draw", (msg) => {
     // console.log(msg);
     stroke(msg.strokeColor);
+    strokeWeight(strokeThickness);
     line(msg.pmouseX, msg.pmouseY, msg.mouseX, msg.mouseY);
 });
 
@@ -75,7 +77,7 @@ socket.on("players", (players) => {
 
 function setup() {
     let cnv = createCanvas(640, 480);
-    cnv.parent("#center");
+    cnv.parent("#canvas");
 
 }
 
@@ -85,11 +87,12 @@ function draw() {
 
 function mouseDragged() {
     stroke(strokeColor);
+    strokeWeight(strokeThickness);
     line(pmouseX, pmouseY, mouseX, mouseY);
     socket.emit('line', { room, pmouseX, pmouseY, mouseX, mouseY, strokeColor });
 }
 
-function createColorTable() {
+function createColorButtons() {
     let colors = ["black", "red", "yellow", "green", "blue", "white"];
     let btn;
     for (let i = 0; i < colors.length; i++) {
@@ -97,10 +100,24 @@ function createColorTable() {
             stroke(colors[i]);
             strokeColor = colors[i];
         })
+        btn.addClass("ColorButton");
         btn.css("background-color", colors[i]);
-        $("#drawing-tools").append(btn);
+        $("#colorButtons").append(btn);
     }
-    // btn.appendTo("#drawing-tools");
 }
 
-createColorTable();
+function createWeightButtons() {
+    let weights = [1, 5, 10, 20, 40];
+    let btn;
+    for (let i = 0; i < 5; i++) {
+        btn = $("<button>" + weights[i] + "</button>").on("click", (event) => {
+            strokeWeight(weights[i]);
+            strokeThickness = weights[i];
+        })
+        btn.addClass("ThicknessButton");
+        $("#weightButtons").append(btn);
+    }
+}
+
+createColorButtons();
+createWeightButtons();
