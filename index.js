@@ -24,6 +24,10 @@ class Room {
 
     addPlayer(player) {
         this.players.push(player);
+        io.to(room).emit('chat', { nickname: player.nickname, message: 'has joined', type: 'system' }) // notify the players
+        io.to(room).emit('players', this.players.players.map((player) => {
+            return { nickname: player.nickname, points: player.points }
+        })); // emit the current room to everyone in it
     }
 
     removePlayer(playerName) {
@@ -50,6 +54,11 @@ class Room {
 
     guesserRight(nickname) {
         let index = -1;
+        for (let i = 0; i < this.players.lengt; ++i) {
+            if (this.players[i].nickname == nickname) {
+                this.players[i].points += 1;
+            }
+        }
         for (let i = 0; i < this.guessers.length; ++i) {
             if (this.guessers[i].nickname == nickname) {
                 index = i
@@ -80,10 +89,7 @@ io.on('connection', (socket) => {
             rooms[room] = new Room(room);
         }
         rooms[room].addPlayer(new Player(socket, nick));
-        io.to(room).emit('chat', { nickname: nick, message: 'has joined', type: 'system' }) // notify the players
-        io.to(room).emit('players', rooms[room].players.map((player) => {
-            return { nickname: player.nickname, points: player.points }
-        })); // emit the current room to everyone in it
+
         if (rooms[room].inGame) {
             socket.emit('start', undefined);
         }
