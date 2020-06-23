@@ -57,7 +57,8 @@ socket.on("chat", (msg) => {
 socket.on("start", (msg) => {
     $('#start').hide();
     $('#center').show();
-    console.log("starting")
+    console.log("starting");
+    clear();
 });
 
 socket.on("draw", (msg) => {

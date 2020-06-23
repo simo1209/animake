@@ -113,7 +113,7 @@ io.on('connection', (socket) => {
     });
 
     socket.on('line', (line) => { // When player draws line
-        if (rooms[room]) {
+        if (rooms[room] && rooms[room].inGame) {
             if (nick == rooms[room].drawer.nickname) {
                 socket.broadcast.to(room).emit('draw', line); // Draw it on everyone else's canvas
             }
