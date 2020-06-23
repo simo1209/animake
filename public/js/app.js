@@ -92,8 +92,8 @@ function mouseDragged() {
 function createColorTable() {
     let colors = ["black", "red", "yellow", "green", "blue", "white"];
     let btn;
-    for (let i = 0; i < 6; i++) {
-        btn = $("<button><button>").on("click", (event) => {
+    for (let i = 0; i < colors.length; i++) {
+        btn = $("<button></button>").on("click", (event) => {
             stroke(colors[i]);
             strokeColor = colors[i];
         })
