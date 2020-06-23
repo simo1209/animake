@@ -57,6 +57,7 @@ socket.on("chat", (msg) => {
 socket.on("start", (msg) => {
     $('#start').hide();
     $('#center').show();
+    console.log("starting")
 });
 
 socket.on("draw", (msg) => {
@@ -69,7 +70,7 @@ socket.on("players", (players) => {
     console.log(players);
     select("#players").html("");
     players.forEach(player => {
-        select("#players").child(createDiv(player));
+        select("#players").child(createDiv(player.nickname+" "+player.points));
     });
 });
 

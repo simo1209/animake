@@ -7,13 +7,23 @@ app.use(express.static('public'))
 
 let words = ["dog", "cat", "pikachu", "stickman"];
 
+class Player {
+    constructor(socket, nickname) {
+        this.socket = socket;
+        this.nickname = nickname;
+        this.points = 0;
+    }
+}
+
 class Room {
-    constructor() {
+    constructor(roomId) {
+        this.roomId = roomId;
         this.players = [];
+        this.inGame = false;
     }
 
-    addPlayer(playerName) {
-        this.players.push(playerName);
+    addPlayer(player) {
+        this.players.push(player);
     }
 
     removePlayer(playerName) {
@@ -27,17 +37,15 @@ class Room {
     }
 
     startGame() {
+        this.inGame = true;
         this.generateWord();
-        this.drawer = this.players[Math.floor(Math.random() * this.players.length)];
-        console.log("Drawer: ", this.drawer);
-        this.guessers = Array.from(this.players);
-        let index = -1;
-        for (let i = 0; i < this.guessers.length; ++i) {
-            if (this.guessers[i].nickname == this.drawer) {
-                index = i
-            }
-        };
-        if (index !== -1) this.guessers.splice(index, 1);
+        this.guessers = this.players.slice();
+        this.guessers.sort(() => Math.random() - 0.5);; // Shuffles the players
+        this.drawer = this.guessers.pop(); // Picks random player as the drawer
+
+        io.to(this.roomId).emit('chat', { nickname: this.drawer.nickname, message: "is drawing", type: 'system' });
+        this.drawer.socket.emit("chat", { nickname: this.drawer.nickname, message: `You must draw: ${this.guessWord}`, type: 'system' });
+        io.to(this.roomId).emit('start', undefined);
     }
 
     guesserRight(nickname) {
@@ -48,6 +56,9 @@ class Room {
             }
         };
         if (index !== -1) this.guessers.splice(index, 1);
+        if (this.guessers.length == 0) {
+            this.startGame();
+        }
     }
 
     generateWord() {
@@ -55,7 +66,6 @@ class Room {
     }
 
 }
-
 
 let rooms = {};
 
@@ -67,11 +77,16 @@ io.on('connection', (socket) => {
     socket.on('nick', (n) => { // When the client emits it's nickname
         nick = n;
         if (!rooms[room]) {
-            rooms[room] = new Room();
+            rooms[room] = new Room(room);
         }
-        rooms[room].addPlayer(nick);
+        rooms[room].addPlayer(new Player(socket, nick));
         io.to(room).emit('chat', { nickname: nick, message: 'has joined', type: 'system' }) // notify the players
-        io.to(room).emit('players', rooms[room].players); // emit the current room to everyone in it
+        io.to(room).emit('players', rooms[room].players.map((player) => {
+            return { nickname: player.nickname, points: player.points }
+        })); // emit the current room to everyone in it
+        if (rooms[room].inGame) {
+            socket.emit('start', undefined);
+        }
     });
 
     socket.on('room', (r) => { // when someone tries to enter a room
@@ -81,14 +96,14 @@ io.on('connection', (socket) => {
 
     socket.on('line', (line) => { // When player draws line
         if (rooms[room]) {
-            if (nick == rooms[room].drawer) {
+            if (nick == rooms[room].drawer.nickname) {
                 socket.broadcast.to(room).emit('draw', line); // Draw it on everyone else's canvas
             }
         }
     });
 
     socket.on('chat', (msg) => { // When someone sends message to chat 
-        if (msg == rooms[room].guessWord && nick != rooms[room].drawer) { // the player guessed the word right
+        if (msg == rooms[room].guessWord && socket != rooms[room].drawer.socket) { // a player(who is not the drawer) guessed the word right
             io.to(room).emit('chat', { nickname: nick, message: "guessed the word", type: 'system' })
             rooms[room].guesserRight(nick);
         } else {
@@ -98,14 +113,16 @@ io.on('connection', (socket) => {
 
     socket.on('start', (msg) => { // When someone clicks the start button
         rooms[room].startGame();
-        io.to(room).emit('start', undefined);
+
     })
 
     socket.on('disconnect', () => {
         console.log('user disconnected');
         if (rooms[room]) {
             rooms[room].removePlayer(nick);
-            io.to(room).emit('players', rooms[room].players); // emit the current room to everyone in it
+            io.to(room).emit('players', rooms[room].players.map((player) => {
+                return { nickname: player.nickname, points: player.points }
+            })); // emit the current room to everyone in it
         }
     });
 });
