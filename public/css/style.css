@@ -1,37 +1,135 @@
-#drawing{
-    display: flex;
+body {
+    background-color: rgb(80, 167, 211);
 }
 
-canvas{
+#logo {
+    position: relative;
+    left: 45%;
+    width: 10%;
+    height: 5%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding-bottom: 2%;
+}
+
+#logo img {
+    height: 4em;
+}
+
+#nickname {
+    position: relative;
+    top: 30%;
+    left: 45%;
     margin: 0;
     padding: 0;
-    border: 3px solid black;
 }
 
-#players{
+#nick-form {
+    padding: 0;
+    margin: 0;
+    /* width: 10%; */
+}
+
+#nick-form p {
+    padding: 0;
+    margin: 0;
+    font-size: larger;
+}
+
+#nick-form button {
+    background-color: rgb(80, 167, 211);
+    border: none;
+    color: black;
+    padding: 0;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+}
+
+#drawing {
+    display: flex;
+    align-items: baseline;
+    justify-content: center;
+    height: 90%;
+    width: 100%;
+}
+
+canvas {
+    margin: 0;
+    padding: 0;
+    background-color: white;
+}
+
+#players {
+    /* align-self: ; */
+    position: relative;
     flex: 0 0 10%;
 }
 
-#canvas{
+#center {
+    align-self: flex-start;
+    position: relative;
+    /* margin-top: %;    */
     flex: 0 0 35%;
 }
 
-#textbox{
-    margin-left: 30px;
-    flex: 1;    
+#textbox {
+    flex: 1;
 }
 
-#messages{
-    height: 460px;
+#start {
+    /* align-self: flex-start; */
+    margin-top: 0;
+    margin-left: 0.5em;
+    background-color: rgb(80, 167, 211);
+    border: solid black;
+    color: black;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 20px;
+}
+
+#start:hover,
+#nick-form button:hover {
+    color: white;
+}
+
+#chat {
+    margin-left: 0.5em;
+}
+
+#messages {
+    flex: 0 0 15;
+    position: static;
+    text-align: justify;
+    background-color: white;
+    height: 70%;
+    width: 100%;
+    /* max-width: 13.8em; */
     overflow: scroll;
 }
 
-#submit{
-    height: 26px;
-}
-
-form{
+form {
     height: inherit;
     padding: 0;
     margin: 0;
+}
+
+::-webkit-scrollbar {
+    width: 10px;
+}
+
+ ::-webkit-scrollbar-track {
+    background: rgb(219, 218, 218);
+}
+
+ ::-webkit-scrollbar-thumb {
+    background: rgb(133, 132, 132);
+}
+
+ ::-webkit-scrollbar-thumb:hover {
+    background: rgb(83, 83, 83);
 }

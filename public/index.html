@@ -2,31 +2,36 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport"
-        content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Dral</title>
     <link rel="stylesheet" href="/css/style.css">
 </head>
 
 <body>
+    <div id="logo">
+        <img src="resources/logo_placeholder.png" alt="Animake Logo">
+    </div>
     <div id="nickname">
         <form id="nick-form" action="">
+            <p> Select your username </p>
             <input type="text" id="nick">
-            <button>Send</button>
+            <button>Play</button>
         </form>
     </div>
     <div id="drawing">
         <div id="players">
-
+            <p> Players </p>
         </div>
-        <div id="canvas">
+        <div id="center">
+            <div class="word">
+            </div>
+            <div id="canvas">
 
+            </div>
         </div>
         <div id="chat">
             <div id="messages">
-
-
             </div>
             <div id="textbox">
                 <form action="">
@@ -34,8 +39,8 @@
                 </form>
             </div>
         </div>
+        <button id="start">Start Game</button>
     </div>
-    <button id="start">Start Game</button>
     <script src="/socket.io/socket.io.js"></script>
     <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
     <script src="/js/p5.min.js"></script>

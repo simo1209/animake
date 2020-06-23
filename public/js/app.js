@@ -2,19 +2,19 @@ let socket = io();
 
 let room;
 
-$(function () {
+$(function() {
     $('#drawing').hide();
-    $('#canvas').hide();
+    $('#center').hide();
     $('#start').hide();
 
-    $('#start').click(function (e) {
+    $('#start').click(function(e) {
         e.preventDefault(); // prevents page reloading
         socket.emit('start', undefined);
 
         return false;
     })
 
-    $('#textbox>form').submit(function (e) {
+    $('#textbox>form').submit(function(e) {
         e.preventDefault(); // prevents page reloading
         socket.emit('chat', $('#m').val());
         $('#m').val('');
@@ -23,7 +23,7 @@ $(function () {
 
 
 
-    $('#nick-form').submit(function (e) {
+    $('#nick-form').submit(function(e) {
 
         room = window.location.search.split('?')[1];
         if (room) {
@@ -56,7 +56,7 @@ socket.on("chat", (msg) => {
 
 socket.on("start", (msg) => {
     $('#start').hide();
-    $('#canvas').show();
+    $('#center').show();
 });
 
 socket.on("draw", (msg) => {
@@ -75,7 +75,7 @@ socket.on("players", (players) => {
 
 function setup() {
     let cnv = createCanvas(640, 480);
-    cnv.parent("#canvas");
+    cnv.parent("#center");
 
 }
 
