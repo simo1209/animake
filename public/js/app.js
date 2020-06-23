@@ -63,7 +63,7 @@ socket.on("start", (msg) => {
 socket.on("draw", (msg) => {
     // console.log(msg);
     stroke(msg.strokeColor);
-    strokeWeight(strokeThickness);
+    strokeWeight(msg.strokeThickness);
     line(msg.pmouseX, msg.pmouseY, msg.mouseX, msg.mouseY);
 });
 
@@ -89,7 +89,7 @@ function mouseDragged() {
     stroke(strokeColor);
     strokeWeight(strokeThickness);
     line(pmouseX, pmouseY, mouseX, mouseY);
-    socket.emit('line', { room, pmouseX, pmouseY, mouseX, mouseY, strokeColor });
+    socket.emit('line', { room, pmouseX, pmouseY, mouseX, mouseY, strokeColor, strokeThickness });
 }
 
 function createColorButtons() {
